@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Arbitragem Brasil</title>
+    <link rel="manifest" href="/manifest.json">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .contenedor {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 22px;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        #resultado {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .dato {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+
+        .semaforo {
+            margin-top: 18px;
+            padding: 14px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <h1>ML Arbitragem Brasil</h1>
+
+    <label>EAN / Código de barras</label>
+    <input
+        type="text"
+        id="ean"
+        placeholder="Ej: 7891000100103"
+    >
+<button type="button" onclick="iniciarScanner()">
+    Escanear código
+</button>
+
+<div id="scanner" style="margin-top:15px;"></div>
+    <label>Costo de compra (R$)</label>
+    <input
+        type="number"
+        id="precioCompra"
+        step="0.01"
+        placeholder="Ej: 6.00"
+    >
+
+    <label>ROI objetivo (%)</label>
+    <input
+        type="number"
+        id="roiObjetivo"
+        value="30"
+    >
+<label>Forma de envío</label>
+<select id="tipo_envio">
+    <option value="gratis">Envío gratis</option>
+    <option value="cliente">El cliente paga el envío</option>
+</select>
+    <button onclick="analizarProducto()">
+        Analizar producto
+    </button>
+
+    <div id="resultado"></div>
+
+</div>
+
+<script>
+
+async function analizarProducto() {
+
+    const ean = document.getElementById("ean").value;
+    const precioCompra = document.getElementById("precioCompra").value;
+    const roiObjetivo = document.getElementById("roiObjetivo").value;
+const tipoEnvio = document.getElementById("tipo_envio").value;
+    const resultado = document.getElementById("resultado");
+
+    if (!ean || !precioCompra) {
+        alert("Ingresa el EAN y el costo de compra");
+        return;
+    }
+
+    resultado.style.display = "block";
+    resultado.innerHTML = "Analizando...";
+
+    try {
+
+        const url = `/analisis-ean/${ean}?precio_compra=${precioCompra}&roi_objetivo=${roiObjetivo}&tipo_envio=${tipoEnvio}`;
+
+const response = await fetch(url);
+const data = await response.json();
+
+        if (data.status !== "ok") {
+            resultado.innerHTML =
+                "No fue posible analizar el producto.";
+            return;
+        }
+
+        let claseSemaforo = "";
+
+        if (data.semaforo === "COMPRAR") {
+            claseSemaforo = "🟢";
+        } else if (data.semaforo === "ANALIZAR") {
+            claseSemaforo = "🟡";
+        } else {
+            claseSemaforo = "🔴";
+        }
+
+        resultado.innerHTML = `
+            <h2>${data.producto}</h2>
+
+            <div class="dato">
+                <strong>EAN:</strong> ${data.ean}
+            </div>
+
+            <div class="dato">
+                <strong>Publicaciones:</strong>
+                ${data.total_publicaciones}
+            </div>
+            <div class="dato">
+    <strong>Ranking ML:</strong>
+    ${data.ranking ? "#" + data.ranking : "Fuera del Top 20"}
+</div>
+
+            <div class="dato">
+                <strong>Precio ML referencia:</strong>
+                R$ ${data.precio_venta_referencia}
+            </div>
+            <div class="dato">
+    <strong>Precio mínimo competencia:</strong>
+    R$ ${data.precio_minimo_competencia}
+</div>
+
+<div class="dato">
+    <strong>Precio promedio competencia:</strong>
+    R$ ${data.precio_promedio_competencia}
+</div>
+<div class="dato">
+    <strong>Precio recomendado:</strong>
+    R$ ${data.precio_recomendado}
+</div>
+            <div class="dato">
+                <strong>Costo de compra:</strong>
+                R$ ${data.precio_compra}
+            </div>
+<div class="dato">
+    <strong>Tarifa ML:</strong>
+    R$ ${data.comision}
+</div>
+
+<div class="dato">
+    <strong>Envío ML:</strong>
+    R$ ${data.costo_envio}
+</div>
+            <div class="dato">
+                <strong>Ganancia:</strong>
+                R$ ${data.ganancia}
+            </div>
+
+            <div class="dato">
+                <strong>ROI:</strong>
+                ${data.roi}%
+            </div>
+
+            <div class="dato">
+                <strong>Margen:</strong>
+                ${data.margen}%
+            </div>
+
+            <div class="dato">
+                <strong>Costo máximo:</strong>
+                R$ ${data.costo_maximo}
+            </div>
+
+            <div class="semaforo">
+                ${claseSemaforo} ${data.semaforo}
+            </div>
+        `;
+
+    } catch (error) {
+
+        resultado.innerHTML =
+            "Error de conexión con el servidor.";
+
+    }
+}
+
+</script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+let scannerActivo = false;
+
+function iniciarScanner() {
+
+    if (scannerActivo) {
+        return;
+    }
+
+    scannerActivo = true;
+
+    const scanner = new Html5Qrcode("scanner");
+
+    scanner.start(
+        { facingMode: "environment" },
+        {
+            fps: 10,
+            qrbox: {
+                width: 300,
+                height: 150
+            }
+        },
+        (codigo) => {
+
+            document.getElementById("ean").value = codigo;
+
+            scanner.stop().then(() => {
+                scannerActivo = false;
+                document.getElementById("scanner").innerHTML = "";
+            });
+
+        },
+        () => {
+        }
+    ).catch(() => {
+        scannerActivo = false;
+        alert("No fue posible iniciar la cámara.");
+    });
+}
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js")
+        .then(() => console.log("App instalada correctamente"))
+        .catch(error => console.log("Error Service Worker:", error));
+}
+</script>
+</body>
+</html>
