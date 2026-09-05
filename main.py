@@ -178,15 +178,14 @@ def callback(code: str | None = None):
     }
 @app.get("/me")
 def me():
-    try:
-        with open("tokens.json", "r", encoding="utf-8") as f:
-            tokens = json.load(f)
-    except FileNotFoundError:
-        return {
-            "status": "error",
-            "mensaje": "No existe tokens.json"
-        }
 
+    tokens = obtener_tokens_supabase()
+
+    if not tokens:
+            return {
+                "status": "error",
+                "mensaje": "No hay tokens guardados en Supabase"
+    }
     access_token = tokens.get("access_token")
 
     if not access_token:
@@ -218,14 +217,13 @@ def me():
     }
 @app.get("/ean/{ean}")
 def buscar_ean(ean: str):
-    try:
-        with open("tokens.json", "r", encoding="utf-8") as f:
-            tokens = json.load(f)
-    except FileNotFoundError:
-        return {
-            "status": "error",
-            "mensaje": "No existe tokens.json"
-        }
+    tokens = obtener_tokens_supabase()
+
+    if not tokens:
+     return {
+        "status": "error",
+        "mensaje": "No hay tokens guardados en Supabase"
+    }
 
     access_token = tokens.get("access_token")
 
@@ -281,14 +279,14 @@ def buscar_ean(ean: str):
     }
 @app.get("/competencia/{product_id}")
 def competencia(product_id: str):
-    try:
-        with open("tokens.json", "r", encoding="utf-8") as f:
-            tokens = json.load(f)
-    except FileNotFoundError:
+
+    tokens = obtener_tokens_supabase()
+
+    if not tokens:
         return {
             "status": "error",
-            "mensaje": "No existe tokens.json"
-        }
+            "mensaje": "No hay tokens guardados en Supabase"
+    }
 
     access_token = tokens.get("access_token")
 
@@ -403,14 +401,13 @@ def analisis_ean(
     otros_costos: float = 0,
     roi_objetivo: float = 30
 ):
-    try:
-        with open("tokens.json", "r", encoding="utf-8") as f:
-            tokens = json.load(f)
-    except FileNotFoundError:
+    tokens = obtener_tokens_supabase()
+
+    if not tokens:
         return {
-            "status": "error",
-            "mensaje": "No existe tokens.json"
-        }
+        "status": "error",
+        "mensaje": "No hay tokens guardados en Supabase"
+    }
 
     access_token = tokens.get("access_token")
 
@@ -636,15 +633,13 @@ def analisis_ean(
     }
 @app.get("/item/{item_id}")
 def detalle_item(item_id: str):
-    try:
-        with open("tokens.json", "r", encoding="utf-8") as f:
-            tokens = json.load(f)
-    except FileNotFoundError:
-        return {
-            "status": "error",
-            "mensaje": "No existe tokens.json"
-        }
+    tokens = obtener_tokens_supabase()
 
+    if not tokens:
+        return {
+        "status": "error",
+        "mensaje": "No hay tokens guardados en Supabase"
+    }
     access_token = tokens.get("access_token")
 
     if not access_token:
