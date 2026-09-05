@@ -11,6 +11,8 @@ load_dotenv(override=True)
 ML_CLIENT_ID = os.getenv("ML_CLIENT_ID")
 ML_CLIENT_SECRET = os.getenv("ML_CLIENT_SECRET")
 ML_REDIRECT_URI = os.getenv("ML_REDIRECT_URI")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_SECRET_KEY = os.getenv("SUPABASE_SECRET_KEY")
 
 app = FastAPI(
     title="ML Arbitragem Brasil",
@@ -18,10 +20,71 @@ app = FastAPI(
     version="1.0.0"
 )
 app.mount("/icons", StaticFiles(directory="icons"), name="icons")
+def supabase_headers():
+    return {
+        "apikey": SUPABASE_SECRET_KEY,
+        "Authorization": f"Bearer {SUPABASE_SECRET_KEY}",
+        "Content-Type": "application/json"
+    }
+
+
+def obtener_tokens_supabase():
+    try:
+        response = requests.get(
+            f"{SUPABASE_URL}/rest/v1/ml_tokens",
+            headers=supabase_headers(),
+            params={
+                "id": "eq.1",
+                "select": "access_token,refresh_token,expires_in"
+            },
+            timeout=20
+        )
+
+        if response.status_code != 200:
+            return None
+
+        datos = response.json()
+
+        if not datos:
+            return None
+
+        return datos[0]
+
+    except Exception:
+        return None
+
+
+def guardar_tokens_supabase(tokens):
+    try:
+        datos = {
+            "id": 1,
+            "access_token": tokens.get("access_token"),
+            "refresh_token": tokens.get("refresh_token"),
+            "expires_in": tokens.get("expires_in")
+        }
+
+        response = requests.post(
+            f"{SUPABASE_URL}/rest/v1/ml_tokens?on_conflict=id",
+            headers={
+                **supabase_headers(),
+                "Prefer": "resolution=merge-duplicates,return=minimal"
+            },
+            json=datos,
+            timeout=20
+        )
+
+        return response.status_code in (200, 201, 204)
+
+    except Exception:
+        return False
+
+
 def renovar_access_token():
     try:
-        with open("tokens.json", "r", encoding="utf-8") as f:
-            tokens = json.load(f)
+        tokens = obtener_tokens_supabase()
+
+        if not tokens:
+            return None
 
         refresh_token = tokens.get("refresh_token")
 
@@ -44,8 +107,8 @@ def renovar_access_token():
 
         nuevos_tokens = response.json()
 
-        with open("tokens.json", "w", encoding="utf-8") as f:
-            json.dump(nuevos_tokens, f, indent=4)
+        if not guardar_tokens_supabase(nuevos_tokens):
+            return None
 
         return nuevos_tokens.get("access_token")
 
@@ -102,17 +165,11 @@ def callback(code: str | None = None):
 
     token_data = response.json()
 
-    with open("tokens.json", "w", encoding="utf-8") as f:
-        json.dump(
-            {
-                "access_token": token_data.get("access_token"),
-                "refresh_token": token_data.get("refresh_token"),
-                "expires_in": token_data.get("expires_in"),
-                "user_id": token_data.get("user_id")
-            },
-            f,
-            indent=2
-        )
+    if not guardar_tokens_supabase(token_data):
+        return {
+        "status": "error",
+        "mensaje": "No fue posible guardar los tokens en Supabase"
+    }
 
     return {
         "status": "conectado",
@@ -376,7 +433,7 @@ def analisis_ean(
         timeout=20
     )
     if response_producto.status_code == 401:
-        access_token = renovar_access_token()
+        access_token = ()
 
         if not access_token:
             return {
