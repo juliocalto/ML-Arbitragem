@@ -201,6 +201,38 @@ def me():
         }
     )
 
+    if response.status_code == 401:
+        access_token = renovar_access_token()
+
+        if not access_token:
+            return {
+                "status": "error",
+                "mensaje": "No fue posible renovar el access_token"
+        }
+
+    response = requests.get(
+        "https://api.mercadolibre.com/users/me",
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    if response.status_code == 401:
+        access_token = renovar_access_token()
+
+        if not access_token:
+            return {
+                "status": "error",
+                "mensaje": "No fue posible renovar el access_token"
+            }
+
+        response = requests.get(
+            "https://api.mercadolibre.com/users/me",
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            }
+        )
+
     if response.status_code != 200:
         return {
             "status": "error",
