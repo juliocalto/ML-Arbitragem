@@ -604,13 +604,15 @@ def analisis_ean(
             item_id_referencia = publicaciones[0].get("id")
 
     if not precios:
-        if precio_compra > 0:
-            precios = [precio_compra]
-    else:
         return {
-            "status": "error",
-            "mensaje": "No se encontraron precios para este producto"
-        }
+        "status": "sin_precio",
+        "ean": ean,
+        "producto": producto.get("name"),
+        "product_id": product_id,
+        "total_publicaciones": len(resultados),
+        "ranking": ranking,
+        "mensaje": "Producto encontrado, pero no hay precios activos disponibles en Mercado Livre"
+    }
     
     precio_minimo = min(precios)
     precio_promedio = sum(precios) / len(precios)
