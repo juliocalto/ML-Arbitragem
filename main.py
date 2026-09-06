@@ -462,7 +462,7 @@ def analisis_ean(
         timeout=20
     )
     if response_producto.status_code == 401:
-        access_token = ()
+        access_token = renovar_access_token()
 
         if not access_token:
             return {
