@@ -492,11 +492,36 @@ def analisis_ean(
     resultados_producto = data_producto.get("results", [])
 
     if not resultados_producto:
-        return {
-            "status": "ok",
-            "ean": ean,
-            "encontrado": False
-        }
+        response_alternativa = requests.get(
+        "https://api.mercadolibre.com/sites/MLB/search",
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        },
+        params={
+            "q": ean,
+            "limit": 10
+        },
+        timeout=20
+    )
+
+    if response_alternativa.status_code == 200:
+        data_alternativa = response_alternativa.json()
+        items_alternativos = data_alternativa.get("results", [])
+
+        if items_alternativos:
+            return {
+                "status": "alternativo",
+                "ean": ean,
+                "encontrado": False,
+                "mensaje": "EAN no encontrado en catálogo, pero existen publicaciones relacionadas",
+                "publicaciones_alternativas": len(items_alternativos)
+            }
+
+    return {
+        "status": "ok",
+        "ean": ean,
+        "encontrado": False
+    }
 
     producto = resultados_producto[0]
     product_id = producto.get("id")
