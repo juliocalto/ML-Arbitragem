@@ -164,7 +164,7 @@ const data = await response.json();
         }
 
         resultado.innerHTML = `
-            <h2>${data.producto}</h2>
+            <h2>${data.producto || "Producto no encontrado en Mercado Livre"}</h2>
 
             <div class="dato">
                 <strong>EAN:</strong> ${data.ean}
@@ -172,7 +172,7 @@ const data = await response.json();
 
             <div class="dato">
                 <strong>Publicaciones:</strong>
-                ${data.total_publicaciones}
+                ${data.total_publicaciones ?? "No disponible"}
             </div>
             <div class="dato">
     <strong>Ranking ML:</strong>
@@ -181,56 +181,56 @@ const data = await response.json();
 
             <div class="dato">
                 <strong>Precio ML referencia:</strong>
-                R$ ${data.precio_venta_referencia}
+                R$ ${data.precio_venta_referencia ?? "No disponible"}
             </div>
             <div class="dato">
     <strong>Precio mínimo competencia:</strong>
-    R$ ${data.precio_minimo_competencia}
+    R$ ${data.precio_minimo_competencia ?? "No disponible"}
 </div>
 
 <div class="dato">
     <strong>Precio promedio competencia:</strong>
-    R$ ${data.precio_promedio_competencia}
+    R$ ${data.precio_promedio_competencia ?? "No disponible"}
 </div>
 <div class="dato">
     <strong>Precio recomendado:</strong>
-    R$ ${data.precio_recomendado}
+    R$ ${data.precio_recomendado ?? "No disponible"}
 </div>
             <div class="dato">
                 <strong>Costo de compra:</strong>
-                R$ ${data.precio_compra}
+                R$ ${data.precio_compra ?? "No disponible"}
             </div>
 <div class="dato">
     <strong>Tarifa ML:</strong>
-    R$ ${data.comision}
+    R$ ${data.comision ?? "No disponible"}
 </div>
 
 <div class="dato">
     <strong>Envío ML:</strong>
-    R$ ${data.costo_envio}
+    R$ ${data.costo_envio ?? "No disponible"}
 </div>
             <div class="dato">
                 <strong>Ganancia:</strong>
-                R$ ${data.ganancia}
+                R$ ${data.ganancia ?? "No disponible"}
             </div>
 
             <div class="dato">
                 <strong>ROI:</strong>
-                ${data.roi}%
+                ${data.roi ?? "No disponible"}%
             </div>
 
             <div class="dato">
                 <strong>Margen:</strong>
-                ${data.margen}%
+                ${data.margen ?? "No disponible"}%
             </div>
 
             <div class="dato">
                 <strong>Costo máximo:</strong>
-                R$ ${data.costo_maximo}
+                R$ ${data.costo_maximo ?? "No disponible"}
             </div>
 
             <div class="semaforo">
-                ${claseSemaforo} ${data.semaforo}
+                ${claseSemaforo} ${data.semaforo ?? "SIN RESULTADO"}
             </div>
         `;
 
