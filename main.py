@@ -504,24 +504,24 @@ def analisis_ean(
         timeout=20
     )
 
-    if response_alternativa.status_code == 200:
-        data_alternativa = response_alternativa.json()
-        items_alternativos = data_alternativa.get("results", [])
+        if response_alternativa.status_code == 200:
+            data_alternativa = response_alternativa.json()
+            items_alternativos = data_alternativa.get("results", [])
 
-        if items_alternativos:
-            return {
-                "status": "alternativo",
-                "ean": ean,
-                "encontrado": False,
-                "mensaje": "EAN no encontrado en catálogo, pero existen publicaciones relacionadas",
-                "publicaciones_alternativas": len(items_alternativos)
-            }
+            if items_alternativos:
+                return {
+                    "status": "alternativo",
+                    "ean": ean,
+                    "encontrado": False,
+                    "mensaje": "EAN no encontrado en catálogo, pero existen publicaciones relacionadas",
+                    "publicaciones_alternativas": len(items_alternativos)
+                }
 
-    return {
-        "status": "ok",
-        "ean": ean,
-        "encontrado": False
-    }
+        return {
+            "status": "ok",
+            "ean": ean,
+            "encontrado": False
+        }
 
     producto = resultados_producto[0]
     product_id = producto.get("id")
