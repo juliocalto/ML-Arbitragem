@@ -482,14 +482,18 @@ def analisis_ean(
             },
             timeout=20
         )
-    if response_producto.status_code != 200:
+    if response_producto.status_code == 404:
+        resultados_producto = []
+
+    elif response_producto.status_code != 200:
         return {
             "status": "error",
             "codigo_http": response_producto.status_code
-        }
+    }
 
-    data_producto = response_producto.json()
-    resultados_producto = data_producto.get("results", [])
+    else:
+        data_producto = response_producto.json()
+        resultados_producto = data_producto.get("results", [])
 
     if not resultados_producto:
         response_alternativa = requests.get(
