@@ -709,7 +709,7 @@ def analisis_ean(
         "ean": ean,
         "producto": producto.get("name"),
         "product_id": product_id,
-        "total_publicaciones": data_competencia.get("paging", {}).get("total", len(resultados)),
+        "total_publicaciones": len(resultados),
         "ranking": ranking,
         "precio_minimo_competencia": round(precio_minimo, 2),
 "precio_promedio_competencia": round(precio_promedio, 2),
