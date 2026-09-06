@@ -553,14 +553,18 @@ def analisis_ean(
         timeout=20
     )
 
-    if response_competencia.status_code != 200:
+    if response_competencia.status_code == 404:
+        resultados = []
+
+    elif response_competencia.status_code != 200:
         return {
             "status": "error",
             "codigo_http": response_competencia.status_code
-        }
+    }
 
-    data_competencia = response_competencia.json()
-    resultados = data_competencia.get("results", [])
+    else:
+        data_competencia = response_competencia.json()
+        resultados = data_competencia.get("results", [])
     item_id_referencia = None
 
     if resultados:
