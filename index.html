@@ -147,11 +147,22 @@ const tipoEnvio = document.getElementById("tipo_envio").value;
 const response = await fetch(url);
 const data = await response.json();
 
-        if (data.status !== "ok") {
-            resultado.innerHTML =
-                "No fue posible analizar el producto.";
-            return;
-        }
+        if (data.status === "sin_precio") {
+    resultado.innerHTML = `
+        <h2>${data.producto || "Producto encontrado"}</h2>
+        <p><strong>EAN:</strong> ${data.ean}</p>
+        <p><strong>Publicaciones:</strong> ${data.total_publicaciones ?? 0}</p>
+        <p><strong>Ranking ML:</strong> ${data.ranking ? "#" + data.ranking : "Fuera del Top 20"}</p>
+        <p><strong>⚠️ ${data.mensaje}</strong></p>
+        <p>No se puede calcular el ROI hasta obtener un precio real de Mercado Livre.</p>
+    `;
+    return;
+}
+
+if (data.status !== "ok") {
+    resultado.innerHTML = data.mensaje || "No fue posible analizar el producto.";
+    return;
+}
 
         let claseSemaforo = "";
 
