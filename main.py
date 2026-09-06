@@ -578,10 +578,40 @@ def analisis_ean(
     
 
     if not precios:
+        response_precios = requests.get(
+        "https://api.mercadolibre.com/sites/MLB/search",
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        },
+        params={
+            "q": ean,
+            "limit": 20
+        },
+        timeout=20
+    )
+
+    if response_precios.status_code == 200:
+        data_precios = response_precios.json()
+        publicaciones = data_precios.get("results", [])
+
+        precios = [
+            item.get("price")
+            for item in publicaciones
+            if isinstance(item.get("price"), (int, float))
+        ]
+
+        if publicaciones and not item_id_referencia:
+            item_id_referencia = publicaciones[0].get("id")
+
+    if not precios:
+        if precio_compra > 0:
+            precios = [precio_compra]
+    else:
         return {
             "status": "error",
-            "mensaje": "No se encontraron precios"
+            "mensaje": "No se encontraron precios para este producto"
         }
+    
     precio_minimo = min(precios)
     precio_promedio = sum(precios) / len(precios)
     precio_recomendado = statistics.median(precios)
