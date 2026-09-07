@@ -604,6 +604,27 @@ def analisis_ean(
         if publicaciones and not item_id_referencia:
             item_id_referencia = publicaciones[0].get("id")
 
+    if not category_id and item_id_referencia:
+        response_item = requests.get(
+            f"https://api.mercadolibre.com/items/{item_id_referencia}",
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            },
+            timeout=20
+        )
+
+        if response_item.status_code == 200:
+            data_item = response_item.json()
+            category_id = data_item.get("category_id")
+            print(
+                "CATEGORIA ITEM EAN:",
+                ean,
+                "ITEM:",
+                item_id_referencia,
+                "CATEGORY_ID:",
+                category_id
+            )
+
     if not precios:
         return {
         "status": "sin_precio",
