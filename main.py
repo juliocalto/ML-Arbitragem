@@ -616,7 +616,16 @@ def analisis_ean(
     
     precio_minimo = min(precios)
     precio_promedio = sum(precios) / len(precios)
-    precio_recomendado = statistics.median(precios)
+    cantidad_precios = len(precios)
+    precio_mediana = statistics.median(precios)
+
+    if cantidad_precios <= 2:
+        precio_recomendado = precio_minimo
+    elif cantidad_precios <= 5:
+        precio_recomendado = min(precio_mediana, precio_minimo * 1.10)
+    else:
+        precio_recomendado = precio_mediana
+
     precio_venta = round(precio_recomendado, 2)
 
     response_tarifa = requests.get(
@@ -714,8 +723,8 @@ def analisis_ean(
         "total_publicaciones": len(resultados),
         "ranking": ranking,
         "precio_minimo_competencia": round(precio_minimo, 2),
-"precio_promedio_competencia": round(precio_promedio, 2),
-"precio_recomendado": round(precio_recomendado, 2),
+        "precio_promedio_competencia": round(precio_promedio, 2),
+        "precio_recomendado": round(precio_recomendado, 2),
         "precio_venta_referencia": precio_venta,
         "precio_compra": round(precio_compra, 2),
         "comision": round(comision, 2),
