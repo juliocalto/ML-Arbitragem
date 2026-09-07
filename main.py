@@ -532,6 +532,7 @@ def analisis_ean(
 
 
     category_id = producto.get("category_id")
+    print("CATEGORIA ML EAN:", ean, "CATEGORY_ID:", category_id)
     ranking = None
 
     response_ranking = requests.get(
