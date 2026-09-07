@@ -679,7 +679,7 @@ def analisis_ean(
         todo_brasil = cobertura.get("all_country", {})
         costo_envio = float(todo_brasil.get("list_cost", 0))
 
-    print("ENVIO DATA:", response_envio.text)
+    print("ENVIO DATA EAN", ean, "ITEM", item_id_referencia, ":", response_envio.text)
     print("ENVIO STATUS:", response_envio.status_code)
 
     ganancia = (
