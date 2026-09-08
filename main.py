@@ -590,7 +590,7 @@ def analisis_ean(
         },
         timeout=20
     )
-    response_precios = None
+    
     if response_precios is not None and response_precios.status_code == 200:
         data_precios = response_precios.json()
         publicaciones = data_precios.get("results", [])
