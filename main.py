@@ -567,7 +567,7 @@ def analisis_ean(
         data_competencia = response_competencia.json()
         resultados = data_competencia.get("results", [])
     item_id_referencia = None
-
+    response_precios = None
     if resultados:
      item_id_referencia = resultados[0].get("item_id")
      print("ITEM ID REFERENCIA:", item_id_referencia)
