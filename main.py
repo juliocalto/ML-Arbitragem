@@ -612,6 +612,8 @@ def analisis_ean(
             },
             timeout=20
         )
+        print("ITEM STATUS:", response_item.status_code)
+        print("ITEM DATA:", response_item.text)
 
         if response_item.status_code == 200:
             data_item = response_item.json()
