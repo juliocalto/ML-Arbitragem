@@ -678,7 +678,7 @@ def analisis_ean(
     else:
             comision = 0
     response_envio = requests.get(
-        f"https://api.mercadolibre.com/users/515849137/shipping_options/free",
+        f"https://api.mercadolibre.com/users/515849137/",
         headers={
             "Authorization": f"Bearer {access_token}"
         },
@@ -705,6 +705,7 @@ def analisis_ean(
 
     print("ENVIO DATA EAN", ean, "ITEM", item_id_referencia, ":", response_envio.text)
     print("ENVIO STATUS:", response_envio.status_code)
+    print("ENVIO RESPUESTA COMPLETA:", response_envio.text)
 
     ganancia = (
         precio_venta
