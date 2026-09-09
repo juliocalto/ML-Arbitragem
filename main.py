@@ -678,7 +678,7 @@ def analisis_ean(
     else:
             comision = 0
     response_envio = requests.get(
-        f"https://api.mercadolibre.com/users/515849137/",
+        f"https://api.mercadolibre.com/users/515849137/shipping_options/free",
         headers={
             "Authorization": f"Bearer {access_token}"
         },
