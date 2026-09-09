@@ -696,7 +696,7 @@ def analisis_ean(
     )           
            
     costo_envio = 0
-
+    print("TIPO ENVIO RECIBIDO:", repr(tipo_envio))
     if tipo_envio == "gratis" and response_envio.status_code == 200:
         data_envio = response_envio.json()
         cobertura = data_envio.get("coverage", {})
