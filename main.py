@@ -731,6 +731,8 @@ def analisis_ean(
         if precio_venta > 0
         else 0
     )
+    if costo_maximo < 0:
+        costo_maximo = 0
 
     if roi >= roi_objetivo:
         semaforo = "COMPRAR"
