@@ -694,7 +694,7 @@ def analisis_ean(
         },
         timeout=20
     )           
-           
+    print("URL ENVIO EXACTA:", response_envio.url)       
     costo_envio = 0
     print("TIPO ENVIO RECIBIDO:", repr(tipo_envio))
     if tipo_envio == "gratis" and response_envio.status_code == 200:
