@@ -651,7 +651,7 @@ def analisis_ean(
         precio_recomendado = precio_mediana
 
     precio_venta = round(precio_recomendado, 2)
-
+    print("TARIFA EAN:", ean, "CATEGORY_ID:", category_id, "PRECIO:", precio_venta, "LISTING:", listing_type_id)
     response_tarifa = requests.get(
     "https://api.mercadolibre.com/sites/MLB/listing_prices",
     headers={
