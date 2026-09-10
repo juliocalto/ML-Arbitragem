@@ -660,12 +660,13 @@ def analisis_ean(
     params={
         "price": precio_venta,
         "currency_id": "BRL",
-        "category_id": category_id,
+        "catalog_product_id": product_id,
         "listing_type_id": listing_type_id
     },
     timeout=20
 )
-
+    print("TARIFA STATUS:", response_tarifa.status_code)
+    print("TARIFA RESPUESTA:", response_tarifa.text)
     if response_tarifa.status_code == 200:
         data_tarifa = response_tarifa.json()
 
