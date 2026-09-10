@@ -694,18 +694,18 @@ def analisis_ean(
         },
         timeout=20
     )           
-    print("URL ENVIO EXACTA:", response_envio.url)       
+           
     costo_envio = 0
-    print("TIPO ENVIO RECIBIDO:", repr(tipo_envio))
+    
     if tipo_envio == "gratis" and response_envio.status_code == 200:
         data_envio = response_envio.json()
         cobertura = data_envio.get("coverage", {})
         todo_brasil = cobertura.get("all_country", {})
         costo_envio = float(todo_brasil.get("list_cost", 0))
 
-    print("ENVIO DATA EAN", ean, "ITEM", item_id_referencia, ":", response_envio.text)
-    print("ENVIO STATUS:", response_envio.status_code)
-    print("ENVIO RESPUESTA COMPLETA:", response_envio.text)
+    
+    
+    
 
     ganancia = (
         precio_venta
