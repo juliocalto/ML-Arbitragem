@@ -545,6 +545,12 @@ def analisis_ean(
 
     print("DOMAIN CATEGORIES STATUS:", response_categorias.status_code)
     print("DOMAIN CATEGORIES DATA:", response_categorias.text)
+    if response_categorias.status_code == 200:
+        categorias_domain = response_categorias.json()
+
+    if categorias_domain:
+        category_id = categorias_domain[0].get("id")
+        print("CATEGORY ID DESDE DOMAIN:", category_id)
     print("CATEGORIA ML EAN:", ean, "CATEGORY_ID:", category_id)
     ranking = None
 
