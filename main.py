@@ -679,7 +679,7 @@ def analisis_ean(
     params={
         "price": precio_venta,
         "currency_id": "BRL",
-        "catalog_product_id": product_id,
+        "category_id": category_id,
         "listing_type_id": listing_type_id,
     },
     timeout=20
