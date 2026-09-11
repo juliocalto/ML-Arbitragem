@@ -532,7 +532,7 @@ def analisis_ean(
     print("PRODUCT ID EAN:", ean, "PRODUCT_ID:", product_id)
 
     print("PRODUCTO COMPLETO:", producto)
-
+    print("DOMAIN ID EAN:", ean, "DOMAIN_ID:", producto.get("domain_id"))
     category_id = producto.get("category_id")
     print("CATEGORIA ML EAN:", ean, "CATEGORY_ID:", category_id)
     ranking = None
