@@ -531,6 +531,7 @@ def analisis_ean(
     product_id = producto.get("id")
     print("PRODUCT ID EAN:", ean, "PRODUCT_ID:", product_id)
 
+    print("PRODUCTO COMPLETO:", producto)
 
     category_id = producto.get("category_id")
     print("CATEGORIA ML EAN:", ean, "CATEGORY_ID:", category_id)
