@@ -533,7 +533,18 @@ def analisis_ean(
 
     print("PRODUCTO COMPLETO:", producto)
     print("DOMAIN ID EAN:", ean, "DOMAIN_ID:", producto.get("domain_id"))
+    domain_id = producto.get("domain_id")
     category_id = producto.get("category_id")
+
+    if not category_id and domain_id:
+        response_categorias = requests.get(
+        f"https://api.mercadolibre.com/catalog_domains/{domain_id}/categories",
+        headers={"Authorization": f"Bearer {access_token}"},
+        timeout=20
+    )
+
+    print("DOMAIN CATEGORIES STATUS:", response_categorias.status_code)
+    print("DOMAIN CATEGORIES DATA:", response_categorias.text)
     print("CATEGORIA ML EAN:", ean, "CATEGORY_ID:", category_id)
     ranking = None
 
