@@ -716,6 +716,9 @@ def analisis_ean(
     )           
            
     costo_envio = 0
+
+    print("ENVIO STATUS:", response_envio.status_code)
+    print("ENVIO RESPUESTA:", response_envio.text)
     
     if tipo_envio == "gratis" and response_envio.status_code == 200:
         data_envio = response_envio.json()
