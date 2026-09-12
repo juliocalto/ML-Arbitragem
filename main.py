@@ -590,7 +590,14 @@ def analisis_ean(
     if resultados:
      item_id_referencia = resultados[0].get("item_id")
      print("ITEM ID REFERENCIA:", item_id_referencia)
-     print("RESULTADOS COMPETENCIA:", resultados)
+     for item in resultados:
+        print(
+        "ITEM ENVIO:",
+        item.get("item_id"),
+        "PRECIO:", item.get("price"),
+        "CATEGORIA:", item.get("category_id"),
+        "SHIPPING:", item.get("shipping")
+    )
     precios = [
         item.get("price")
         for item in resultados
