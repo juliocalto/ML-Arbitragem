@@ -176,10 +176,13 @@ if (!esEAN && data.status === "ok") {
     resultado.innerHTML = `
         <h2>Productos encontrados</h2>
         ${resultados.map((p, i) => `
-            <div style="padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
-                <strong>${i + 1}. ${p.name || "Producto sin nombre"}</strong><br>
-                ID: ${p.id || "No disponible"}
-            </div>
+            <div
+    onclick="seleccionarProducto('${p.id}', '${(p.name || "").replace(/'/g, "\\'")}')"
+    style="padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px; cursor:pointer;"
+>
+    <strong>${i + 1}. ${p.name || "Producto sin nombre"}</strong><br>
+    ID: ${p.id || "No disponible"}
+</div>
         `).join("")}
     `;
     return;
@@ -296,6 +299,11 @@ if (data.status !== "ok") {
             "Error de conexión con el servidor.";
 
     }
+}
+
+function seleccionarProducto(productId, nombre) {
+    document.getElementById("busquedaProducto").value = productId;
+    analizarProducto();
 }
 
 </script>
