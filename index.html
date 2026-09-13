@@ -156,13 +156,16 @@ const tipoEnvio = document.getElementById("tipo_envio").value;
 
     try {
 const esEAN = /^\d{8,14}$/.test(busqueda);
-    const url = esEAN
+const esProductId = /^MLB\d+$/i.test(busqueda);
+const esAnalizable = esEAN || esProductId;
+
+const url = esAnalizable
     ? `/analisis-ean/${busqueda}?precio_compra=${precioCompra}&listing_type_id=gold_special&tipo_envio=${tipoEnvio}&roi_objetivo=${roiObjetivo}`
     : `/buscar-producto?q=${encodeURIComponent(busqueda)}`;
 
 const response = await fetch(url);
 const data = await response.json();
-if (!esEAN && data.status === "ok") {
+if (!esAnalizable && data.status === "ok") {
     const resultados = data.resultados || [];
 
     if (resultados.length === 0) {
