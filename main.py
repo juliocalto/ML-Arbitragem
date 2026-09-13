@@ -670,12 +670,16 @@ def analisis_ean(
     cantidad_precios = len(precios)
     precio_mediana = statistics.median(precios)
 
+    precios_ordenados = sorted(precios)
+
     if cantidad_precios <= 2:
         precio_recomendado = precio_minimo
-    elif cantidad_precios <= 5:
-        precio_recomendado = min(precio_mediana, precio_minimo * 1.10)
     else:
-        precio_recomendado = precio_mediana
+        cantidad_competitiva = max(3, round(cantidad_precios * 0.30))
+        cantidad_competitiva = min(cantidad_competitiva, cantidad_precios)
+
+        precios_competitivos = precios_ordenados[:cantidad_competitiva]
+        precio_recomendado = statistics.median(precios_competitivos)
 
     precio_venta = round(precio_recomendado, 2)
     print("TARIFA EAN:", ean, "CATEGORY_ID:", category_id, "PRECIO:", precio_venta, "LISTING:", listing_type_id)
