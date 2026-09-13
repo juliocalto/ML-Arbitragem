@@ -486,7 +486,7 @@ def analisis_ean(
             "status": "error",
             "mensaje": "No hay access_token guardado"
         }
-
+    es_product_id = ean.upper().startswith("MLB")
     response_producto = requests.get(
         "https://api.mercadolibre.com/products/search",
         headers={
@@ -495,7 +495,8 @@ def analisis_ean(
         params={
             "status": "active",
             "site_id": "MLB",
-            "product_identifier": ean
+            "product_identifier": ean if not es_product_id else None,
+"product_id": ean if es_product_id else None
         },
         timeout=20
     )
