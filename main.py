@@ -795,6 +795,7 @@ def analisis_ean(
         "precio_promedio_competencia": round(precio_promedio, 2),
         "precio_recomendado": round(precio_recomendado, 2),
         "posicion_precio": posicion_precio,
+        "nivel_competencia": nivel_competencia,
         "precio_venta_referencia": precio_venta,
         "precio_compra": round(precio_compra, 2),
         "comision": round(comision, 2),
