@@ -716,7 +716,6 @@ def analisis_ean(
             "listing_type_id": listing_type_id,
             "mode": "me2",
             "condition": "new",
-            "logistic_type": "drop_off",
             "free_shipping": "true",
             "verbose": "true"
         },
