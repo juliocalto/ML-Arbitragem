@@ -156,13 +156,34 @@ const tipoEnvio = document.getElementById("tipo_envio").value;
 
     try {
 const esEAN = /^\d{8,14}$/.test(busqueda);
-        const url = esEAN
+    const url = esEAN
     ? `/analisis-ean/${busqueda}?precio_compra=${precioCompra}&listing_type_id=gold_special&tipo_envio=${tipoEnvio}&roi_objetivo=${roiObjetivo}`
     : `/buscar-producto?q=${encodeURIComponent(busqueda)}`;
 
 const response = await fetch(url);
 const data = await response.json();
+if (!esEAN && data.status === "ok") {
+    const resultados = data.resultados || [];
 
+    if (resultados.length === 0) {
+        resultado.innerHTML = `
+            <h2>No se encontraron productos</h2>
+            <p>Prueba con otra descripción más específica.</p>
+        `;
+        return;
+    }
+
+    resultado.innerHTML = `
+        <h2>Productos encontrados</h2>
+        ${resultados.map((p, i) => `
+            <div style="padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+                <strong>${i + 1}. ${p.name || "Producto sin nombre"}</strong><br>
+                ID: ${p.id || "No disponible"}
+            </div>
+        `).join("")}
+    `;
+    return;
+}
         if (data.status === "sin_precio") {
     resultado.innerHTML = `
         <h2>${data.producto || "Producto encontrado"}</h2>
