@@ -681,7 +681,14 @@ def analisis_ean(
         precios_competitivos = precios_ordenados[:cantidad_competitiva]
         precio_recomendado = statistics.median(precios_competitivos)
         posicion_precio = sum(1 for p in precios_ordenados if p < precio_recomendado) + 1
+        porcentaje_posicion = posicion_precio / cantidad_precios
 
+    if porcentaje_posicion <= 0.25:
+        nivel_competencia = "Alta competitividad"
+    elif porcentaje_posicion <= 0.50:
+        nivel_competencia = "Competitividad media"
+    else:
+        nivel_competencia = "Competitividad baja"
     precio_venta = round(precio_recomendado, 2)
     print("TARIFA EAN:", ean, "CATEGORY_ID:", category_id, "PRECIO:", precio_venta, "LISTING:", listing_type_id)
     response_tarifa = requests.get(
