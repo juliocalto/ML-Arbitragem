@@ -211,6 +211,10 @@ if (data.status !== "ok") {
     <strong>Posición competitiva:</strong>
     ${data.posicion_precio ?? "No disponible"} de ${data.total_publicaciones ?? "?"}
 </div>
+<div class="dato">
+    <strong>Nivel de competitividad:</strong>
+    ${data.nivel_competencia ?? "No disponible"}
+</div>
             <div class="dato">
                 <strong>Costo de compra:</strong>
                 R$ ${data.precio_compra ?? "No disponible"}
