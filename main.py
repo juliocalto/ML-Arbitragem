@@ -496,8 +496,9 @@ def analisis_ean(
             "status": "active",
             "site_id": "MLB",
             "product_identifier": ean if not es_product_id else None,
-"product_id": ean if es_product_id else None
+            "q": ean if es_product_id else None
         },
+ 
         timeout=20
     )
     if response_producto.status_code == 401:
