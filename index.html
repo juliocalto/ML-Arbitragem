@@ -84,12 +84,26 @@
 
     <h1>ML Arbitragem Brasil</h1>
 
-    <label>EAN / Código de barras</label>
+    <label>Buscar producto</label>
+
+<div style="display:flex; gap:8px; align-items:center;">
     <input
         type="text"
-        id="ean"
-        placeholder="Ej: 7891000100103"
+        id="busquedaProducto"
+        placeholder="Buscar en Mercado Livre"
+        style="flex:1;"
     >
+
+    <button
+        type="button"
+        onclick="abrirBusquedaFoto()"
+        style="width:55px; font-size:24px;"
+        title="Buscar por foto"
+    >
+        📷
+    </button>
+</div>
+
 <button type="button" onclick="iniciarScanner()">
     Escanear código
 </button>
@@ -126,14 +140,14 @@
 
 async function analizarProducto() {
 
-    const ean = document.getElementById("ean").value;
+    const busqueda = document.getElementById("busquedaProducto").value.trim();
     const precioCompra = document.getElementById("precioCompra").value;
     const roiObjetivo = document.getElementById("roiObjetivo").value;
 const tipoEnvio = document.getElementById("tipo_envio").value;
     const resultado = document.getElementById("resultado");
 
-    if (!ean || !precioCompra) {
-        alert("Ingresa el EAN y el costo de compra");
+    if (!busqueda || !precioCompra) {
+        alert("Ingresa el producto y el costo de compra");
         return;
     }
 
@@ -141,8 +155,10 @@ const tipoEnvio = document.getElementById("tipo_envio").value;
     resultado.innerHTML = "Analizando...";
 
     try {
-
-        const url = `/analisis-ean/${ean}?precio_compra=${precioCompra}&roi_objetivo=${roiObjetivo}&tipo_envio=${tipoEnvio}`;
+const esEAN = /^\d{8,14}$/.test(busqueda);
+        const url = esEAN
+    ? `/analisis-ean/${busqueda}?precio_compra=${precioCompra}&listing_type_id=gold_special&tipo_envio=${tipoEnvio}&roi_objetivo=${roiObjetivo}`
+    : `/buscar-producto?q=${encodeURIComponent(busqueda)}`;
 
 const response = await fetch(url);
 const data = await response.json();
@@ -265,7 +281,23 @@ if (data.status !== "ok") {
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
 let scannerActivo = false;
+function abrirBusquedaFoto() {
+    const inputFoto = document.createElement("input");
 
+    inputFoto.type = "file";
+    inputFoto.accept = "image/*";
+    inputFoto.setAttribute("capture", "environment");
+
+    inputFoto.onchange = function () {
+        const foto = inputFoto.files[0];
+
+        if (foto) {
+            console.log("Foto seleccionada:", foto.name);
+        }
+    };
+
+    inputFoto.click();
+}
 function iniciarScanner() {
 
     if (scannerActivo) {

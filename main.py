@@ -424,6 +424,44 @@ def analisis(
 "roi_objetivo": round(roi_objetivo, 2),
 "costo_maximo": round(costo_maximo, 2),
     "semaforo": semaforo}
+@app.get("/buscar-producto")
+def buscar_producto(q: str):
+    tokens = obtener_tokens_supabase()
+
+    if not tokens:
+        return {
+            "status": "error",
+            "mensaje": "No hay tokens guardados en Supabase"
+        }
+
+    access_token = tokens.get("access_token")
+
+    response = requests.get(
+        "https://api.mercadolibre.com/products/search",
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        },
+        params={
+            "status": "active",
+            "site_id": "MLB",
+            "q": q,
+            "limit": 5
+        },
+        timeout=20
+    )
+
+    if response.status_code != 200:
+        return {
+            "status": "error",
+            "mensaje": "No fue posible buscar el producto"
+        }
+
+    data = response.json()
+
+    return {
+        "status": "ok",
+        "resultados": data.get("results", [])
+    }
 @app.get("/analisis-ean/{ean}")
 def analisis_ean(
     ean: str,
