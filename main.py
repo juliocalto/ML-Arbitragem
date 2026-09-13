@@ -773,7 +773,7 @@ def analisis_ean(
             "category_id": category_id,
             "listing_type_id": listing_type_id,
             "mode": "me2",
-            "logistic_type": logistic_type_item,
+            # "logistic_type": logistic_type_item,
             "condition": "new",
             "free_shipping": "true",
             "verbose": "true"
