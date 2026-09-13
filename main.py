@@ -245,7 +245,8 @@ def me():
         "status": "ok",
         "id": data.get("id"),
         "nickname": data.get("nickname"),
-        "site_id": data.get("site_id")
+        "site_id": data.get("site_id"),
+"seller_reputation": data.get("seller_reputation")
     }
 @app.get("/ean/{ean}")
 def buscar_ean(ean: str):
