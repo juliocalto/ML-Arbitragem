@@ -680,6 +680,7 @@ def analisis_ean(
 
         precios_competitivos = precios_ordenados[:cantidad_competitiva]
         precio_recomendado = statistics.median(precios_competitivos)
+        posicion_precio = sum(1 for p in precios_ordenados if p < precio_recomendado) + 1
 
     precio_venta = round(precio_recomendado, 2)
     print("TARIFA EAN:", ean, "CATEGORY_ID:", category_id, "PRECIO:", precio_venta, "LISTING:", listing_type_id)
@@ -786,6 +787,7 @@ def analisis_ean(
         "precio_minimo_competencia": round(precio_minimo, 2),
         "precio_promedio_competencia": round(precio_promedio, 2),
         "precio_recomendado": round(precio_recomendado, 2),
+        "posicion_precio": posicion_precio,
         "precio_venta_referencia": precio_venta,
         "precio_compra": round(precio_compra, 2),
         "comision": round(comision, 2),
