@@ -761,8 +761,7 @@ def analisis_ean(
             comision = 0
     else:
             comision = 0
-    print("ITEM ID REFERENCIA:", item_id_referencia)
-    print("LOGISTIC TYPE:", logistic_type_item)
+    
     response_envio = requests.get(
         f"https://api.mercadolibre.com/users/515849137/shipping_options/free",
         headers={
