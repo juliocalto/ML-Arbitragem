@@ -375,10 +375,12 @@ document.getElementById("btn-foto").addEventListener("click", function () {
     document.getElementById("fotoProducto").click();
 });
 
-if (foto) {
-    const formData = new FormData();
-    formData.append("foto", foto);
+document.getElementById("fotoProducto").addEventListener("change", function () {
+    const foto = this.files[0];
 
+    if (foto) {
+        const formData = new FormData();
+        formData.append("foto", foto);
     fetch("/analizar-foto", {
         method: "POST",
         body: formData
@@ -394,7 +396,7 @@ if (foto) {
         alert("Error al analizar la foto");
     });
 }
-
+});
 </script>
 <script>
 if ("serviceWorker" in navigator) {
