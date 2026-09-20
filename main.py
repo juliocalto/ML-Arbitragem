@@ -140,8 +140,18 @@ async def analizar_foto(foto: UploadFile = File(...)):
         }
     ]
 }
-        return {"status": "foto_convertida", "tamano": len(contenido)}
-
+        response_ia = requests.post(
+            "https://api.openai.com/v1/responses",
+            headers={
+                "Authorization": f"Bearer {OPENAI_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json=payload,
+            timeout=60
+        )   
+        data_ia = response_ia.json()
+        producto_detectado = data_ia.get("output_text", "")
+        return {"status": "ok", "producto": producto_detectado}
 @app.get("/")
 def inicio():
     return FileResponse("index.html")
