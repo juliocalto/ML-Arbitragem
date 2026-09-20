@@ -1,4 +1,4 @@
-const CACHE_NAME = "ml-arbitragem-v1";
+const CACHE_NAME = "ml-arbitragem-v2";
 
 const ASSETS = [
   "/",
