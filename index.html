@@ -375,13 +375,25 @@ document.getElementById("btn-foto").addEventListener("click", function () {
     document.getElementById("fotoProducto").click();
 });
 
-document.getElementById("fotoProducto").addEventListener("change", function () {
-    const foto = this.files[0];
+if (foto) {
+    const formData = new FormData();
+    formData.append("foto", foto);
 
-    if (foto) {
-        alert("Foto capturada correctamente");
-    }
-});
+    fetch("/analizar-foto", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Respuesta foto:", data);
+        alert("Producto detectado: " + (data.producto || "No identificado"));
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Error al analizar la foto");
+    });
+}
+
 </script>
 <script>
 if ("serviceWorker" in navigator) {
