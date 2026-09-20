@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 import os
 import requests
 import json
 import statistics
+import base64
 from dotenv import load_dotenv
 from fastapi.responses import RedirectResponse, FileResponse
 load_dotenv(override=True)
@@ -13,8 +14,10 @@ ML_CLIENT_SECRET = os.getenv("ML_CLIENT_SECRET")
 ML_REDIRECT_URI = os.getenv("ML_REDIRECT_URI")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SECRET_KEY = os.getenv("SUPABASE_SECRET_KEY")
-
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+VISION_MODEL = "gpt-5.6"
 app = FastAPI(
+    
     title="ML Arbitragem Brasil",
     description="Sistema de análise de produtos para Mercado Livre Brasil",
     version="1.0.0"
@@ -114,6 +117,30 @@ def renovar_access_token():
 
     except Exception:
         return None
+@app.post("/analizar-foto")
+async def analizar_foto(foto: UploadFile = File(...)):
+        contenido = await foto.read()
+        imagen_base64 = base64.b64encode(contenido).decode("utf-8")
+        tipo_imagen = foto.content_type or "image/jpeg"
+        payload = {
+    "model": VISION_MODEL,
+    "input": [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "input_text",
+                    "text": "Identifica el producto de esta imagen. Devuelve solamente una frase corta con marca, producto y modelo si es visible."
+                },
+                {
+                    "type": "input_image",
+                    "image_url": f"data:{tipo_imagen};base64,{imagen_base64}"
+                }
+            ]
+        }
+    ]
+}
+        return {"status": "foto_convertida", "tamano": len(contenido)}
 
 @app.get("/")
 def inicio():
