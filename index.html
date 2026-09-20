@@ -386,6 +386,7 @@ if (foto) {
     .then(response => response.json())
     .then(data => {
         console.log("Respuesta foto:", data);
+        document.getElementById("producto").value = data.producto || "";
         alert("Producto detectado: " + (data.producto || "No identificado"));
     })
     .catch(error => {
