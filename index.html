@@ -108,6 +108,11 @@
     Escanear código
 </button>
 
+<button type="button" id="btn-foto">
+    📷 Buscar con foto
+</button>
+<input type="file" id="fotoProducto" accept="image/*" capture="environment" style="display:none;">
+
 <div id="scanner" style="margin-top:15px;"></div>
     <label>Costo de compra (R$)</label>
     <input
@@ -366,6 +371,17 @@ function iniciarScanner() {
         alert("No fue posible iniciar la cámara.");
     });
 }
+document.getElementById("btn-foto").addEventListener("click", function () {
+    document.getElementById("fotoProducto").click();
+});
+
+document.getElementById("fotoProducto").addEventListener("change", function () {
+    const foto = this.files[0];
+
+    if (foto) {
+        alert("Foto capturada correctamente");
+    }
+});
 </script>
 <script>
 if ("serviceWorker" in navigator) {
