@@ -108,10 +108,10 @@
     Escanear código
 </button>
 
-<button type="button" id="btn-foto">
+<button type="button" onclick="document.getElementById('fotoProducto').click()">
     📷 Buscar con foto
 </button>
-<input type="file" id="fotoProducto" accept="image/*" capture="environment" style="display:none;">
+
 
 <div id="scanner" style="margin-top:15px;"></div>
     <label>Costo de compra (R$)</label>
@@ -336,39 +336,58 @@ function abrirBusquedaFoto() {
     inputFoto.click();
 }
 function iniciarScanner() {
-
     if (scannerActivo) {
         return;
     }
 
     scannerActivo = true;
 
-    const scanner = new Html5Qrcode("scanner");
+    const scanner = new Html5Qrcode(
+        "scanner",
+        {
+            formatsToSupport: [
+                Html5QrcodeSupportedFormats.EAN_13,
+                Html5QrcodeSupportedFormats.EAN_8,
+                Html5QrcodeSupportedFormats.UPC_A,
+                Html5QrcodeSupportedFormats.UPC_E
+            ],
+            experimentalFeatures: {
+                useBarCodeDetectorIfSupported: true
+            },
+            verbose: false
+        }
+    );
+
+    const config = {
+        fps: 20,
+        qrbox: {
+            width: 350,
+            height: 180
+        },
+        aspectRatio: 1.777778,
+        disableFlip: true
+    };
 
     scanner.start(
         { facingMode: "environment" },
-        {
-            fps: 10,
-            qrbox: {
-                width: 300,
-                height: 150
-            }
-        },
+        config,
         (codigo) => {
+            console.log("EAN detectado:", codigo);
 
-            document.getElementById("ean").value = codigo;
+            document.getElementById("busquedaProducto").value = codigo;
 
             scanner.stop().then(() => {
                 scannerActivo = false;
                 document.getElementById("scanner").innerHTML = "";
             });
-
         },
-        () => {
-        }
-    ).catch(() => {
+        (errorLectura) => {
+    console.log("Intento de lectura:", errorLectura);
+}
+    ).catch((error) => {
+        console.error("Error del escáner:", error);
         scannerActivo = false;
-        alert("No fue posible iniciar la cámara.");
+        alert("No fue posible iniciar el escáner.");
     });
 }
 document.getElementById("btn-foto").addEventListener("click", function () {
