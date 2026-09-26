@@ -622,7 +622,7 @@ def analisis_ean(
             data_alternativa = response_alternativa.json()
             items_alternativos = data_alternativa.get("results", [])
 
-            print("BUSQUEDA ALTERNATIVA EAN:", ean, "STATUS:", response_alternativa.status_code, "TOTAL:", len(items_alternativos))
+            print("BUSQUEDA ALTERNATIVA EAN:", ean, "STATUS:", response_alternativa.status_code, "TOTAL:", len(items_alternativos), flush=True)
 
             if items_alternativos:
                 resultados_producto = items_alternativos
