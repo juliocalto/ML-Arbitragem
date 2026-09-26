@@ -618,12 +618,14 @@ def analisis_ean(
         timeout=20
     )
 
-        if response_alternativa.status_code == 200:
+    if response_alternativa.status_code == 200:
             data_alternativa = response_alternativa.json()
             items_alternativos = data_alternativa.get("results", [])
 
-        if items_alternativos:
-            resultados_producto = items_alternativos
+            print("BUSQUEDA ALTERNATIVA EAN:", ean, "STATUS:", response_alternativa.status_code, "TOTAL:", len(items_alternativos))
+
+            if items_alternativos:
+                resultados_producto = items_alternativos
 
     if not resultados_producto:
         return {
