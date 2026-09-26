@@ -603,6 +603,8 @@ def analisis_ean(
         data_producto = response_producto.json()
         resultados_producto = data_producto.get("results", [])
 
+    items_alternativos = []
+
     if not resultados_producto:
         response_alternativa = requests.get(
         "https://api.mercadolibre.com/sites/MLB/search",
