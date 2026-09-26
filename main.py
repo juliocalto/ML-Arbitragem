@@ -141,6 +141,8 @@ async def analizar_foto(foto: UploadFile = File(...)):
     ]
 }
         response_ia = requests.post(
+       
+        
             "https://api.openai.com/v1/responses",
             headers={
                 "Authorization": f"Bearer {OPENAI_API_KEY}",
@@ -148,7 +150,10 @@ async def analizar_foto(foto: UploadFile = File(...)):
             },
             json=payload,
             timeout=60
-        )   
+        )
+        print("FOTO IA STATUS:", response_ia.status_code)
+        print("FOTO IA RESPUESTA:", response_ia.text)
+        print("FOTO IA RESPUESTA:", response_ia.text)   
         data_ia = response_ia.json()
         producto_detectado = data_ia.get("output_text", "")
         return {"status": "ok", "producto": producto_detectado}
@@ -377,7 +382,9 @@ def competencia(product_id: str):
     if response.status_code != 200:
         return {
             "status": "error",
-            "codigo_http": response.status_code
+            "codigo_http": response.status_code,
+            "mensaje": "Error al consultar Mercado Libre",
+            "detalle": response.text[:1000]
         }
 
     data = response.json()
@@ -474,6 +481,7 @@ def buscar_producto(q: str):
 
     access_token = tokens.get("access_token")
 
+    # 1. Buscar primero por EAN/GTIN en el catalogo de Mercado Livre
     response = requests.get(
         "https://api.mercadolibre.com/products/search",
         headers={
@@ -482,8 +490,8 @@ def buscar_producto(q: str):
         params={
             "status": "active",
             "site_id": "MLB",
-            "q": q,
-            "limit": 5
+            "product_identifier": q,
+            "limit": 10
         },
         timeout=20
     )
@@ -494,11 +502,33 @@ def buscar_producto(q: str):
             "mensaje": "No fue posible buscar el producto"
         }
 
-    data = response.json()
+        data = response.json()
+        resultados = data.get("results", [])
+
+    # 2. Si product_identifier no encontro resultados,
+    # intentar una segunda busqueda usando el EAN como texto
+    if not resultados:
+        response_alt = requests.get(
+            "https://api.mercadolibre.com/products/search",
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            },
+            params={
+                "status": "active",
+                "site_id": "MLB",
+                "q": q,
+                "limit": 10
+            },
+            timeout=20
+        )
+
+        if response_alt.status_code == 200:
+            data_alt = response_alt.json()
+            resultados = data_alt.get("results", [])
 
     return {
         "status": "ok",
-        "resultados": data.get("results", [])
+        "resultados": resultados
     }
 @app.get("/analisis-ean/{ean}")
 def analisis_ean(
@@ -590,15 +620,10 @@ def analisis_ean(
             data_alternativa = response_alternativa.json()
             items_alternativos = data_alternativa.get("results", [])
 
-            if items_alternativos:
-                return {
-                    "status": "alternativo",
-                    "ean": ean,
-                    "encontrado": False,
-                    "mensaje": "EAN no encontrado en catálogo, pero existen publicaciones relacionadas",
-                    "publicaciones_alternativas": len(items_alternativos)
-                }
+        if items_alternativos:
+            resultados_producto = items_alternativos
 
+    if not resultados_producto:
         return {
             "status": "ok",
             "ean": ean,
