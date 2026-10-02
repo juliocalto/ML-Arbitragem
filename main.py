@@ -336,6 +336,7 @@ def buscar_ean(ean: str):
             "status": "ok",
             "ean": ean,
             "encontrado": False,
+            
             "mensaje": "Producto no encontrado en Mercado Livre"
         }
 
@@ -490,7 +491,7 @@ def buscar_producto(q: str):
         params={
             "status": "active",
             "site_id": "MLB",
-            "product_identifier": q,
+            "q": q,
             "limit": 10
         },
         timeout=20
@@ -502,11 +503,12 @@ def buscar_producto(q: str):
             "mensaje": "No fue posible buscar el producto"
         }
 
-        data = response.json()
-        resultados = data.get("results", [])
+    data = response.json()
+    resultados = data.get("results", [])
 
     # 2. Si product_identifier no encontro resultados,
     # intentar una segunda busqueda usando el EAN como texto
+    print("PRIMERA BUSQUEDA EAN:", q, "RESULTADOS:", len(resultados), flush=True)
     if not resultados:
         response_alt = requests.get(
             "https://api.mercadolibre.com/products/search",
@@ -525,7 +527,32 @@ def buscar_producto(q: str):
         if response_alt.status_code == 200:
             data_alt = response_alt.json()
             resultados = data_alt.get("results", [])
+    # 3. Tercera búsqueda: búsqueda general de Mercado Livre por EAN
+    if not resultados:
+        response_search = requests.get(
+            "https://api.mercadolibre.com/sites/MLB/search",
+            params={
+                "q": q,
+                "limit": 20
+            },
+            timeout=20
+        )
 
+        print(
+            "TERCERA BUSQUEDA EAN:",
+            q,
+            "STATUS:",
+            response_search.status_code
+        )
+
+        if response_search.status_code == 200:
+            data_search = response_search.json()
+            resultados = data_search.get("results", [])
+
+            print(
+                "TERCERA BUSQUEDA RESULTADOS:",
+                len(resultados)
+            )
     return {
         "status": "ok",
         "resultados": resultados
@@ -584,10 +611,11 @@ def analisis_ean(
                 "Authorization": f"Bearer {access_token}"
             },
             params={
-                "status": "active",
-                "site_id": "MLB",
-                "product_identifier": ean
-            },
+    "status": "active",
+    "site_id": "MLB",
+    "product_identifier": ean if not es_product_id else None,
+    "q": ean if es_product_id else None
+},
             timeout=20
         )
     if response_producto.status_code == 404:
@@ -603,35 +631,36 @@ def analisis_ean(
         data_producto = response_producto.json()
         resultados_producto = data_producto.get("results", [])
 
-    items_alternativos = []
-
+    # Segunda busqueda: intentar el EAN como texto en el catalogo
     if not resultados_producto:
-        response_alternativa = requests.get(
-        "https://api.mercadolibre.com/sites/MLB/search",
-        headers={
-            "Authorization": f"Bearer {access_token}"
-        },
-        params={
-            "q": ean,
-            "limit": 10
-        },
-        timeout=20
-    )
+        response_q = requests.get(
+            "https://api.mercadolibre.com/products/search",
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            },
+            params={
+                "status": "active",
+                "site_id": "MLB",
+                "q": ean
+            },
+            timeout=20
+        )
 
-    if response_alternativa.status_code == 200:
-            data_alternativa = response_alternativa.json()
-            items_alternativos = data_alternativa.get("results", [])
+        print("BUSQUEDA Q STATUS:", response_q.status_code)
 
-            print("BUSQUEDA ALTERNATIVA EAN:", ean, "STATUS:", response_alternativa.status_code, "TOTAL:", len(items_alternativos), flush=True)
+        if response_q.status_code == 200:
+            data_q = response_q.json()
+            resultados_producto = data_q.get("results", [])
+            print("BUSQUEDA Q RESULTADOS:", len(resultados_producto))
 
-            if items_alternativos:
-                resultados_producto = items_alternativos
-
+    # Si despues del respaldo sigue vacio, realmente no fue encontrado
     if not resultados_producto:
         return {
             "status": "ok",
             "ean": ean,
-            "encontrado": False
+            "encontrado": False,
+            "requiere_busqueda_alternativa": True,
+            "mensaje": "EAN no vinculado al catálogo de Mercado Livre"
         }
 
     producto = resultados_producto[0]
@@ -706,40 +735,13 @@ def analisis_ean(
         "SHIPPING:", item.get("shipping")
     )
 
-    logistic_type_item = (item.get("shipping") or {}).get("logistic_type")
+    logistic_type_item = ((resultados[0].get("shipping") or {}) if resultados else {}).get("logistic_type")
     
     precios = [
         item.get("price")
         for item in resultados
         if isinstance(item.get("price"), (int, float))
     ]
-    
-
-    if not precios:
-        response_precios = requests.get(
-        "https://api.mercadolibre.com/sites/MLB/search",
-        headers={
-            "Authorization": f"Bearer {access_token}"
-        },
-        params={
-            "q": ean,
-            "limit": 20
-        },
-        timeout=20
-    )
-    
-    if response_precios is not None and response_precios.status_code == 200:
-        data_precios = response_precios.json()
-        publicaciones = data_precios.get("results", [])
-
-        precios = [
-            item.get("price")
-            for item in publicaciones
-            if isinstance(item.get("price"), (int, float))
-        ]
-
-        if publicaciones and not item_id_referencia:
-            item_id_referencia = publicaciones[0].get("id")
 
     if not category_id and item_id_referencia:
         response_item = requests.get(

@@ -112,6 +112,17 @@
     📷 Buscar con foto
 </button>
 
+<div style="margin-top:15px;">
+    <input
+        type="text"
+        id="busquedaNombre"
+        placeholder="Nombre, marca o modelo"
+    >
+    <button type="button" onclick="buscarPorNombre()">
+        🔎 Buscar producto
+    </button>
+</div>
+<div id="resultadosBusqueda" style="margin-top:15px;"></div>
 
 <div id="scanner" style="margin-top:15px;"></div>
     <label>Costo de compra (R$)</label>
@@ -145,7 +156,12 @@
 
 async function analizarProducto() {
 
-    const busqueda = document.getElementById("busquedaProducto").value.trim();
+    const campoNombre = document.getElementById("busquedaNombre");
+const campoProducto = document.getElementById("busquedaProducto");
+
+const busqueda =
+    (campoNombre ? campoNombre.value.trim() : "") ||
+    (campoProducto ? campoProducto.value.trim() : "");
     const precioCompra = document.getElementById("precioCompra").value;
     const roiObjetivo = document.getElementById("roiObjetivo").value;
 const tipoEnvio = document.getElementById("tipo_envio").value;
@@ -167,7 +183,7 @@ const esAnalizable = esEAN || esProductId;
 const url = esAnalizable
     ? `/analisis-ean/${busqueda}?precio_compra=${precioCompra}&listing_type_id=gold_special&tipo_envio=${tipoEnvio}&roi_objetivo=${roiObjetivo}`
     : `/buscar-producto?q=${encodeURIComponent(busqueda)}`;
-
+console.log("URL ANALISIS:", url);
 const response = await fetch(url);
 const data = await response.json();
 if (!esAnalizable && data.status === "ok") {
@@ -335,6 +351,75 @@ function abrirBusquedaFoto() {
 
     inputFoto.click();
 }
+async function buscarPorNombre() {
+    const consulta = document.getElementById("busquedaNombre").value.trim();
+    const contenedor = document.getElementById("resultadosBusqueda");
+
+    if (!consulta) {
+        alert("Escribe el nombre, marca o modelo del producto.");
+        return;
+    }
+
+    contenedor.innerHTML = "🔎 Buscando producto...";
+
+    try {
+        const response = await fetch(
+            "/buscar-producto?q=" + encodeURIComponent(consulta)
+        );
+
+        const data = await response.json();
+
+        console.log("RESULTADO BUSQUEDA:", data);
+if (!data.resultados || data.resultados.length === 0) {
+    contenedor.innerHTML = "❌ No se encontraron productos.";
+    return;
+}
+
+contenedor.innerHTML = "";
+
+data.resultados.forEach(producto => {
+    const imagen =
+        producto.pictures && producto.pictures.length > 0
+            ? producto.pictures[0].url
+            : "";
+
+    const tarjeta = document.createElement("div");
+    tarjeta.style.cursor = "pointer";
+    tarjeta.title = "Seleccionar este producto";
+    tarjeta.onclick = () => {
+    document.getElementById("busquedaNombre").value = producto.id;
+
+    console.log("PRODUCTO SELECCIONADO:", producto);
+    alert("Producto seleccionado: " + (producto.name || producto.id));
+};
+    tarjeta.style.cssText = `
+        display:flex;
+        gap:15px;
+        align-items:center;
+        padding:12px;
+        margin-bottom:10px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        background:white;
+    `;
+
+    tarjeta.innerHTML = `
+        ${imagen ? `<img src="${imagen}" style="width:90px;height:90px;object-fit:contain;">` : ""}
+        <div>
+            <strong>${producto.name || "Producto sin nombre"}</strong><br>
+            <small>ID: ${producto.id || "No disponible"}</small>
+        </div>
+    `;
+
+    contenedor.appendChild(tarjeta);
+});
+
+    } catch (error) {
+        console.error(error);
+        contenedor.innerHTML = "❌ Error al buscar el producto.";
+    }
+}
+
 function iniciarScanner() {
     if (scannerActivo) {
         return;
